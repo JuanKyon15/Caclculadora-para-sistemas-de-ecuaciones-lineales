@@ -1,0 +1,110 @@
+/* Piezas reutilizables: botones, tablas, fórmulas, avisos y pastillas de estado. */
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 8px 16px;
+  border: 1px solid var(--linea-fuerte);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  color: var(--tinta);
+  font: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+.boton:hover { border-color: var(--acento); color: var(--acento); }
+.boton:disabled { opacity: 0.5; cursor: not-allowed; }
+.boton:disabled:hover { border-color: var(--linea-fuerte); color: var(--tinta); }
+.boton-primario { background: var(--acento); border-color: var(--acento); color: var(--acento-tinta); font-weight: 600; }
+.boton-primario:hover { color: var(--acento-tinta); filter: brightness(1.1); }
+.boton-pequeno { min-height: 34px; padding: 4px 11px; font-size: 0.875rem; }
+
+.formula {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px 2px;
+  max-width: 100%;
+}
+
+.nota {
+  padding: 10px 14px;
+  border-radius: var(--radio);
+  background: var(--acento-suave);
+  font-size: 0.95rem;
+}
+
+/* position: relative retiene dentro del contenedor los elementos ocultos con position: absolute. */
+.tabla-desplazable { position: relative; overflow-x: auto; max-width: 100%; }
+
+.tabla-teoria { border-collapse: collapse; width: 100%; font-size: 0.94rem; }
+.tabla-teoria th, .tabla-teoria td { padding: 9px 12px; border-bottom: 1px solid var(--linea); text-align: left; vertical-align: top; }
+.tabla-teoria thead th { font-size: 0.85rem; color: var(--tinta-suave); font-weight: 600; border-bottom-color: var(--linea-fuerte); white-space: nowrap; }
+.tabla-teoria tbody th { font-weight: 600; min-width: 140px; }
+.tabla-numerica td { font-family: var(--letra-numero); font-size: 0.88rem; font-variant-numeric: tabular-nums; white-space: nowrap; vertical-align: middle; }
+.tabla-numerica tbody th { min-width: 200px; vertical-align: middle; }
+
+.aviso { padding: 10px 14px; border-radius: var(--radio); font-size: 0.95rem; }
+.aviso-alerta { background: var(--alerta-fondo); color: var(--alerta); }
+
+.pastilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pastilla::before { font-size: 0.75rem; }
+.pastilla-exito { background: var(--exito-fondo); color: var(--exito); }
+.pastilla-exito::before { content: "✓"; }
+.pastilla-alerta { background: var(--alerta-fondo); color: var(--alerta); }
+.pastilla-alerta::before { content: "!"; }
+.pastilla-peligro { background: var(--peligro-fondo); color: var(--peligro); }
+.pastilla-peligro::before { content: "×"; }
+.pastilla-neutra { background: var(--superficie-2); color: var(--tinta-suave); }
+.pastilla-neutra::before { content: "–"; }
+
+/* Código de color compartido por la teoría y el laboratorio. */
+.valor {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-family: var(--letra-numero);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.valor-anterior { background: var(--anterior-fondo); color: var(--anterior); }
+.valor-actualizado { background: var(--actualizado-fondo); color: var(--actualizado); font-weight: 500; }
+
+.leyenda-valores { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.875rem; color: var(--tinta-suave); }
+.leyenda-valores > span { display: inline-flex; align-items: center; gap: 6px; }
+
+.desglose { display: grid; gap: 10px; min-width: 0; }
+.desglose-filas { overflow-x: auto; display: grid; gap: 12px; padding: 4px 0; }
+.ecuacion-paso {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-family: var(--letra-numero);
+  font-size: 0.9rem;
+  width: max-content;
+}
+.ecuacion-paso sup { font-size: 0.7em; }
+.fraccion { display: inline-grid; justify-items: center; }
+.fraccion-numerador { padding: 0 6px 3px; border-bottom: 1px solid var(--tinta); }
+.fraccion-denominador { padding: 3px 6px 0; }
+.resultado-paso { font-weight: 500; }
+
+.ejemplo-generado { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.ejemplo-generado > p { max-width: var(--ancho-lectura); }
+
+.tabla-compacta { border-collapse: collapse; font-family: var(--letra-numero); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+.tabla-compacta th, .tabla-compacta td { padding: 5px 14px 5px 0; border-bottom: 1px solid var(--linea); text-align: right; white-space: nowrap; }
+.tabla-compacta thead th { color: var(--tinta-suave); font-family: var(--letra-texto); font-weight: 600; border-bottom-color: var(--linea-fuerte); }

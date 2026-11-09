@@ -1,0 +1,67 @@
+/* Página principal: el título y un vector con los integrantes entre corchetes de matriz. */
+
+.portada {
+  min-height: 100vh;
+  max-width: 980px;
+  margin: 0 auto;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 40px;
+  padding-block: 48px;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+}
+
+.portada h1 {
+  font-size: clamp(2rem, 1.2rem + 3.6vw, 3.9rem);
+  line-height: 1.08;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.integrantes { display: grid; gap: 10px; }
+
+.integrantes h2 {
+  font-family: var(--letra-texto);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+.vector-integrantes {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 10px 26px;
+  display: grid;
+  gap: 4px;
+  font-size: 1.2rem;
+}
+.vector-integrantes li + li { margin-top: 0; }
+.vector-integrantes::before, .vector-integrantes::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 11px;
+  border: 2px solid var(--acento);
+}
+.vector-integrantes::before { left: 0; border-right: none; }
+.vector-integrantes::after { right: 0; border-left: none; }
+
+.iniciar {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 12px 28px;
+  border-radius: var(--radio);
+  background: var(--acento);
+  color: var(--acento-tinta);
+  font-size: 1.08rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.iniciar:hover { filter: brightness(1.1); }

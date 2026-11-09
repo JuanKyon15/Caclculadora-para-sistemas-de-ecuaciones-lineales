@@ -1,0 +1,35 @@
+{
+  "folders": [
+    {
+      "name": "metodos-iterativos",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "liveServer.settings.host": "127.0.0.1",
+    "liveServer.settings.port": 5500,
+    "liveServer.settings.root": "/",
+    "liveServer.settings.donotShowInfoMsg": true,
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "extensions": {
+    "recommendations": [
+      "ritwickdey.LiveServer"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Depurar en Chrome (con Live Server encendido)",
+        "type": "chrome",
+        "request": "launch",
+        "url": "http://127.0.0.1:5500/index.html",
+        "webRoot": "${workspaceFolder:metodos-iterativos}"
+      }
+    ]
+  }
+}

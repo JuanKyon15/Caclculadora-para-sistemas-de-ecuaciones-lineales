@@ -1,0 +1,11 @@
+:root { --fondo: #ffffff; --texto: #17212f; --suave: #566273; --linea: #d9e0e8; --bien: #0f7a4f; --mal: #b3261e; color-scheme: light dark; }
+@media (prefers-color-scheme: dark) { :root { --fondo: #12181f; --texto: #e6ebf1; --suave: #a0adbb; --linea: #2d3845; --bien: #4cc28e; --mal: #ff8a80; } }
+body { margin: 0; background: var(--fondo); color: var(--texto); font: 16px/1.5 system-ui, sans-serif; }
+main { max-width: 860px; margin: 0 auto; padding: 32px max(16px, env(safe-area-inset-right, 0px)); }
+h2 { font-size: 18px; margin: 28px 0 8px; }
+ul { list-style: none; margin: 0; padding: 0; }
+li { padding: 6px 0; border-bottom: 1px solid var(--linea); overflow-wrap: anywhere; }
+.bien::before { content: "Correcta · "; color: var(--bien); font-weight: 600; }
+.mal::before { content: "Fallida · "; color: var(--mal); font-weight: 600; }
+.detalle { display: block; color: var(--suave); font-size: 14px; }
+#resumen { font-weight: 600; font-size: 20px; }

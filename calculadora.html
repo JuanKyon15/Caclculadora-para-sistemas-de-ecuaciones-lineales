@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Calculadora Jacobi y Gauss-Seidel</title>
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <meta name="description" content="Aprende y experimenta con los métodos iterativos de Jacobi y Gauss-Seidel para resolver sistemas de ecuaciones lineales.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/disposicion.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  <link rel="stylesheet" href="css/laboratorio.css">
+  <script src="js/nucleo/configuracion-mathjax.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" onerror="avisarFallaMathJax()"></script>
+</head>
+<body>
+  <a class="saltar" href="#laboratorio">Saltar a la calculadora</a>
+
+  <div class="pagina">
+    <header class="barra-lateral">
+      <a class="marca" href="index.html">
+        <span class="marca-simbolo" aria-hidden="true">Ax = b</span>
+        <span class="marca-nombre">Métodos iterativos</span>
+      </a>
+      <nav aria-label="Secciones">
+        <ul id="navegacion" class="navegacion">
+          <li><a class="enlace-laboratorio" href="#laboratorio">Calculadora</a></li>
+          <li><a href="#introduccion">Introducción</a></li>
+          <li><a href="#jacobi">Jacobi</a></li>
+          <li><a href="#gauss-seidel">Gauss-Seidel</a></li>
+          <li><a href="#comparacion">Comparación</a></li>
+        </ul>
+      </nav>
+      <button id="cambiar-tema" class="boton-tema" type="button">Tema oscuro</button>
+    </header>
+
+    <main class="contenido">
+      <p id="aviso-formulas" class="aviso aviso-alerta" hidden>
+        No se pudo descargar MathJax, así que las fórmulas aparecen en formato LaTeX. Conéctate a internet para verlas bien. La calculadora y sus gráficos funcionan sin conexión.
+      </p>
+
+      <section id="laboratorio" class="seccion seccion-laboratorio">
+        <h1>Calculadora</h1>
+        <p class="lab-introduccion">Elige un ejemplo o escribe tu sistema de ecuaciones. Todo se calcula en tu navegador.</p>
+
+        <form id="formulario" class="panel formulario" novalidate autocomplete="off">
+          <div class="formulario-cabecera">
+            <div class="campo">
+              <label for="selector-ejemplo">Sistema de ejemplo</label>
+              <select id="selector-ejemplo"></select>
+            </div>
+            <div class="campo campo-corto">
+              <label for="selector-dimension">Tamaño del sistema</label>
+              <select id="selector-dimension"></select>
+            </div>
+          </div>
+          <p id="descripcion-ejemplo" class="ayuda"></p>
+
+          <div class="pestanas" role="tablist" aria-label="Forma de introducir el sistema">
+            <button id="pestana-matriz" type="button" role="tab" aria-selected="true" aria-controls="vista-matriz">Matriz</button>
+            <button id="pestana-texto" type="button" role="tab" aria-selected="false" aria-controls="vista-texto">Escribir ecuaciones</button>
+          </div>
+
+          <div id="vista-matriz" role="tabpanel" aria-labelledby="pestana-matriz">
+            <div id="rejilla-sistema" class="rejilla-desplazable"></div>
+            <p class="ayuda">La columna x⁽⁰⁾ contiene el valor inicial de cada variable. Puedes editarla.</p>
+            <div class="herramientas">
+              <button id="boton-reordenar" class="boton boton-pequeno" type="button">Reordenar ecuaciones</button>
+              <button id="boton-rellenar" class="boton boton-pequeno" type="button">Rellenar vacíos con 0</button>
+              <button id="boton-inicial-ceros" class="boton boton-pequeno" type="button">Valores iniciales en 0</button>
+              <button id="boton-limpiar" class="boton boton-pequeno" type="button">Limpiar</button>
+            </div>
+          </div>
+
+          <div id="vista-texto" role="tabpanel" aria-labelledby="pestana-texto" hidden>
+            <label for="texto-ecuaciones">Una ecuación por línea</label>
+            <textarea id="texto-ecuaciones" rows="5" spellcheck="false" placeholder="2x + y = 5&#10;x + 3y = 6"></textarea>
+            <p class="ayuda">Admite decimales con punto o coma, fracciones como 1/2x y subíndices como x1 o x_2.</p>
+            <button id="boton-convertir" class="boton boton-pequeno" type="button">Pasar a la matriz</button>
+          </div>
+
+          <div class="parametros">
+            <div class="campo">
+              <label for="campo-tolerancia">Tolerancia</label>
+              <input id="campo-tolerancia" type="text" inputmode="text" value="1e-6">
+            </div>
+            <div class="campo">
+              <label for="campo-iteraciones">Máximo de iteraciones</label>
+              <input id="campo-iteraciones" type="text" inputmode="numeric" value="100">
+            </div>
+            <div class="campo">
+              <label for="campo-decimales">Decimales (cálculo y pantalla)</label>
+              <input id="campo-decimales" type="text" inputmode="numeric" value="8" aria-describedby="ayuda-decimales">
+            </div>
+            <div class="campo">
+              <label for="selector-norma">Norma</label>
+              <select id="selector-norma"></select>
+            </div>
+            <div class="campo">
+              <label for="selector-tipo-error">Tipo de error</label>
+              <select id="selector-tipo-error"></select>
+            </div>
+          </div>
+          <p id="ayuda-decimales" class="ayuda">Cada variable se redondea a esa cantidad de decimales en cuanto se calcula, y Gauss-Seidel usa ya el valor redondeado.</p>
+
+          <fieldset class="selector-metodo">
+            <legend>Método</legend>
+            <div class="segmentado">
+              <label><input type="radio" name="metodo" value="jacobi"><span>Jacobi</span></label>
+              <label><input type="radio" name="metodo" value="gauss-seidel"><span>Gauss-Seidel</span></label>
+              <label><input type="radio" name="metodo" value="comparar" checked><span>Comparar ambos</span></label>
+            </div>
+          </fieldset>
+
+          <div id="mensajes" class="mensajes" aria-live="polite"></div>
+
+          <div class="accion-principal">
+            <button id="boton-calcular" class="boton boton-primario" type="submit">Calcular</button>
+            <span id="aviso-desactualizado" class="aviso-desactualizado" hidden>Cambiaste los datos. Calcula de nuevo para actualizar los resultados.</span>
+          </div>
+        </form>
+
+        <div id="resultados" class="resultados" hidden>
+          <section class="panel" aria-labelledby="titulo-resultado">
+            <h3 id="titulo-resultado">Resultado</h3>
+            <p id="frase-comparacion" class="frase-comparacion" hidden></p>
+            <div id="tarjetas-resultado" class="tarjetas-resultado"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="titulo-analisis">
+            <h3 id="titulo-analisis">Análisis de convergencia</h3>
+            <div id="analisis-convergencia"></div>
+          </section>
+
+          <div id="selector-vista-metodo" class="pestanas" role="tablist" aria-label="Método mostrado en la tabla y en el detalle" hidden>
+            <button type="button" role="tab" data-metodo="jacobi">Ver Jacobi</button>
+            <button type="button" role="tab" data-metodo="gauss-seidel">Ver Gauss-Seidel</button>
+          </div>
+
+          <section class="panel" aria-labelledby="titulo-tabla">
+            <div class="panel-cabecera">
+              <h3 id="titulo-tabla">Tabla de iteraciones</h3>
+              <div class="panel-controles">
+                <button id="boton-copiar" class="boton boton-pequeno" type="button">Copiar tabla</button>
+              </div>
+            </div>
+            <div id="tabla-iteraciones"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="titulo-explorador">
+            <h3 id="titulo-explorador">Paso a paso</h3>
+            <div id="explorador-pasos"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="titulo-graficos">
+            <h3 id="titulo-graficos">Gráficos</h3>
+            <div id="zona-graficos" class="zona-graficos"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="introduccion" class="seccion">
+        <p class="antetitulo">Sección A</p>
+        <h2>Introducción</h2>
+
+        <h3>¿Qué es un sistema de ecuaciones lineales?</h3>
+        <p>Es un conjunto de \(n\) ecuaciones en las que cada incógnita aparece solo multiplicada por una constante. Se escribe de forma compacta como</p>
+        <div class="formula">\[ A\mathbf{x} = \mathbf{b}, \qquad A \in \mathbb{R}^{n\times n},\quad \mathbf{x},\mathbf{b}\in\mathbb{R}^{n}. \]</div>
+        <p>\(A\) contiene los coeficientes, \(\mathbf{b}\) los términos independientes y \(\mathbf{x}\) las incógnitas. Si \(\det(A)\neq 0\), el sistema tiene una única solución.</p>
+
+        <h3>¿Qué es un método iterativo?</h3>
+        <p>Un método iterativo parte de una aproximación inicial \(\mathbf{x}^{(0)}\) y genera una sucesión de aproximaciones mediante una regla fija:</p>
+        <div class="formula">\[ \mathbf{x}^{(k+1)} = T\,\mathbf{x}^{(k)} + \mathbf{c}. \]</div>
+        <p>La matriz \(T\) se llama <strong>matriz de iteración</strong>. Si la sucesión converge, su límite es la solución de \(A\mathbf{x}=\mathbf{b}\). Como el proceso se detiene tras un número finito de pasos, el resultado es una aproximación.</p>
+
+        <h3>¿En qué situaciones se utilizan?</h3>
+        <ul>
+          <li>Sistemas muy grandes y dispersos, con pocos coeficientes distintos de cero, como los que surgen al discretizar ecuaciones diferenciales de transferencia de calor o estructuras.</li>
+          <li>Análisis de redes y circuitos, donde cada ecuación depende de pocas variables vecinas.</li>
+          <li>Problemas con una buena aproximación inicial disponible, como una simulación que avanza en el tiempo.</li>
+          <li>Casos en los que basta una precisión moderada y no se justifica una solución directa.</li>
+        </ul>
+
+        <h3>Métodos directos e iterativos</h3>
+        <div class="tabla-desplazable">
+          <table class="tabla-teoria">
+            <thead><tr><th scope="col">Aspecto</th><th scope="col">Directos (Gauss, LU)</th><th scope="col">Iterativos (Jacobi, Gauss-Seidel)</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Resultado</th><td>Exacto en aritmética exacta, tras un número fijo de operaciones</td><td>Aproximación que mejora con cada paso, si el método converge</td></tr>
+              <tr><th scope="row">Costo</th><td>Del orden de \(n^3\) operaciones en matrices densas</td><td>Del orden de \(n^2\) por iteración, y menos en matrices dispersas</td></tr>
+              <tr><th scope="row">Memoria</th><td>La factorización puede llenar de valores las posiciones que eran cero</td><td>Solo se guarda la matriz original y unos pocos vectores</td></tr>
+              <tr><th scope="row">Convergencia</th><td>No aplica: terminan en un número fijo de pasos si la matriz es invertible</td><td>Depende de la matriz de iteración y no está garantizada</td></tr>
+              <tr><th scope="row">Precisión</th><td>Determinada por el redondeo y el condicionamiento</td><td>Ajustable mediante la tolerancia de parada</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="jacobi" class="seccion">
+        <p class="antetitulo">Sección B</p>
+        <h2>Método de Jacobi</h2>
+
+        <h3>Fundamento matemático</h3>
+        <p>Se descompone la matriz como \(A = D + L + U\), donde \(D\) es su diagonal, \(L\) la parte estrictamente inferior y \(U\) la estrictamente superior. Sustituyendo en \(A\mathbf{x}=\mathbf{b}\) y dejando \(D\mathbf{x}\) a la izquierda:</p>
+        <div class="formula">\[ D\,\mathbf{x}^{(k+1)} = \mathbf{b} - (L+U)\,\mathbf{x}^{(k)} \quad\Longrightarrow\quad \mathbf{x}^{(k+1)} = T_J\,\mathbf{x}^{(k)} + D^{-1}\mathbf{b}, \qquad T_J = -D^{-1}(L+U). \]</div>
+
+        <h3>Despeje de las variables</h3>
+        <p>De la ecuación \(i\) se despeja la variable \(x_i\). Esto exige que \(a_{ii}\neq 0\). Para un sistema de \(3\times 3\):</p>
+        <div class="formula">\[ \begin{aligned}
+          x_1^{(k+1)} &= \frac{b_1 - a_{12}\,x_2^{(k)} - a_{13}\,x_3^{(k)}}{a_{11}} \\[4pt]
+          x_2^{(k+1)} &= \frac{b_2 - a_{21}\,x_1^{(k)} - a_{23}\,x_3^{(k)}}{a_{22}} \\[4pt]
+          x_3^{(k+1)} &= \frac{b_3 - a_{31}\,x_1^{(k)} - a_{32}\,x_2^{(k)}}{a_{33}}
+        \end{aligned} \]</div>
+
+        <h3>Fórmula general</h3>
+        <div class="formula">\[ x_i^{(k+1)} = \frac{1}{a_{ii}}\left( b_i - \sum_{\substack{j=1 \\ j\neq i}}^{n} a_{ij}\,x_j^{(k)} \right), \qquad i = 1,\dots,n. \]</div>
+        <p>Todos los valores del lado derecho provienen de la iteración \(k\). Por eso se necesitan dos vectores en memoria, y cada componente se puede calcular en paralelo.</p>
+
+        <h3>Condiciones de convergencia</h3>
+        <p><strong>Condición necesaria y suficiente.</strong> La sucesión converge para todo \(\mathbf{x}^{(0)}\) si y solo si \(\rho(T_J) &lt; 1\), donde \(\rho\) es el radio espectral, el mayor módulo de los valores propios.</p>
+        <p><strong>Condiciones suficientes.</strong> Cualquiera de estas garantiza la convergencia:</p>
+        <ul>
+          <li>\(A\) tiene dominancia diagonal estricta por filas: \(|a_{ii}| &gt; \sum_{j\neq i}|a_{ij}|\) para todo \(i\).</li>
+          <li>\(A\) tiene dominancia diagonal estricta por columnas.</li>
+          <li>\(A\) es irreducible y diagonalmente dominante, con al menos una desigualdad estricta.</li>
+          <li>\(A\) y \(2D - A\) son simétricas definidas positivas.</li>
+          <li>\(\|T_J\| &lt; 1\) en alguna norma matricial inducida.</li>
+        </ul>
+        <p class="nota">Una condición suficiente solo funciona en un sentido. Si no se cumple, no se puede concluir que el método diverge: hay que examinar \(\rho(T_J)\).</p>
+
+        <h3>Ventajas y desventajas</h3>
+        <div class="dos-columnas">
+          <div>
+            <h4>Ventajas</h4>
+            <ul>
+              <li>Es sencillo de programar.</li>
+              <li>Se paraleliza de forma natural.</li>
+              <li>El resultado no depende del orden de cálculo dentro de la iteración.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Desventajas</h4>
+            <ul>
+              <li>Suele requerir más iteraciones que Gauss-Seidel.</li>
+              <li>Necesita guardar dos vectores.</li>
+              <li>Exige una diagonal sin ceros.</li>
+              <li>Su convergencia no está garantizada.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>Ejemplo desarrollado</h3>
+        <p>Resolvemos el siguiente sistema desde \(\mathbf{x}^{(0)} = (0,0,0)\). Tiene dominancia diagonal estricta por filas, porque \(4&gt;2\), \(8&gt;5\) y \(5&gt;3\), así que la convergencia está garantizada.</p>
+        <div class="formula">\[ \begin{cases} 4x - y + z = 7 \\ 4x - 8y + z = -21 \\ -2x + y + 5z = 15 \end{cases} \]</div>
+        <p><strong>Paso 1. Despeje de cada variable:</strong></p>
+        <div class="formula">\[ x^{(k+1)} = \frac{7 + y^{(k)} - z^{(k)}}{4}, \quad y^{(k+1)} = \frac{21 + 4x^{(k)} + z^{(k)}}{8}, \quad z^{(k+1)} = \frac{15 + 2x^{(k)} - y^{(k)}}{5}. \]</div>
+        <div id="ejemplo-jacobi" class="ejemplo-generado"></div>
+      </section>
+
+      <section id="gauss-seidel" class="seccion">
+        <p class="antetitulo">Sección C</p>
+        <h2>Método de Gauss-Seidel</h2>
+
+        <h3>Fundamento matemático</h3>
+        <p>Con la misma descomposición \(A = D + L + U\), ahora la parte inferior \(L\) se deja del lado de la iteración nueva:</p>
+        <div class="formula">\[ (D+L)\,\mathbf{x}^{(k+1)} = \mathbf{b} - U\,\mathbf{x}^{(k)} \quad\Longrightarrow\quad \mathbf{x}^{(k+1)} = T_G\,\mathbf{x}^{(k)} + (D+L)^{-1}\mathbf{b}, \qquad T_G = -(D+L)^{-1}U. \]</div>
+
+        <h3>Despeje de las variables</h3>
+        <p>El despeje es el mismo que en Jacobi, pero cada variable ya calculada se usa de inmediato en las ecuaciones siguientes:</p>
+        <div class="formula">\[ \begin{aligned}
+          x_1^{(k+1)} &= \frac{b_1 - a_{12}\,x_2^{(k)} - a_{13}\,x_3^{(k)}}{a_{11}} \\[4pt]
+          x_2^{(k+1)} &= \frac{b_2 - a_{21}\,x_1^{(k+1)} - a_{23}\,x_3^{(k)}}{a_{22}} \\[4pt]
+          x_3^{(k+1)} &= \frac{b_3 - a_{31}\,x_1^{(k+1)} - a_{32}\,x_2^{(k+1)}}{a_{33}}
+        \end{aligned} \]</div>
+
+        <h3>Fórmula general</h3>
+        <div class="formula">\[ x_i^{(k+1)} = \frac{1}{a_{ii}}\left( b_i - \sum_{j=1}^{i-1} a_{ij}\,x_j^{(k+1)} - \sum_{j=i+1}^{n} a_{ij}\,x_j^{(k)} \right), \qquad i = 1,\dots,n. \]</div>
+        <p>Basta un solo vector en memoria, que se sobrescribe componente a componente. A cambio, el orden de las ecuaciones afecta al resultado, y el cálculo es secuencial.</p>
+
+        <h3>Condiciones de convergencia</h3>
+        <p><strong>Condición necesaria y suficiente.</strong> La sucesión converge para todo \(\mathbf{x}^{(0)}\) si y solo si \(\rho(T_G) &lt; 1\).</p>
+        <p><strong>Condiciones suficientes.</strong> Cualquiera de estas garantiza la convergencia:</p>
+        <ul>
+          <li>\(A\) tiene dominancia diagonal estricta por filas o por columnas.</li>
+          <li>\(A\) es irreducible y diagonalmente dominante, con al menos una desigualdad estricta.</li>
+          <li>\(A\) es simétrica definida positiva. Esta condición no basta para Jacobi.</li>
+          <li>\(\|T_G\| &lt; 1\) en alguna norma matricial inducida.</li>
+        </ul>
+        <p class="nota">Tampoco aquí el incumplimiento implica divergencia. La calculadora incluye sistemas sin dominancia diagonal en los que Gauss-Seidel converge.</p>
+
+        <h3>Ventajas y desventajas</h3>
+        <div class="dos-columnas">
+          <div>
+            <h4>Ventajas</h4>
+            <ul>
+              <li>Con frecuencia necesita menos iteraciones que Jacobi.</li>
+              <li>Solo requiere un vector en memoria.</li>
+              <li>Tiene garantía para matrices simétricas definidas positivas.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Desventajas</h4>
+            <ul>
+              <li>Es difícil de paralelizar, por la dependencia entre componentes.</li>
+              <li>Su comportamiento depende del orden de las ecuaciones.</li>
+              <li>Exige una diagonal sin ceros.</li>
+              <li>No siempre converge, ni siquiera cuando Jacobi lo hace.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>Ejemplo desarrollado</h3>
+        <p>Usamos el mismo sistema y el mismo punto inicial que en Jacobi, para comparar directamente.</p>
+        <p><strong>Paso 1. Despeje con actualización inmediata:</strong></p>
+        <div class="formula">\[ x^{(k+1)} = \frac{7 + y^{(k)} - z^{(k)}}{4}, \quad y^{(k+1)} = \frac{21 + 4x^{(k+1)} + z^{(k)}}{8}, \quad z^{(k+1)} = \frac{15 + 2x^{(k+1)} - y^{(k+1)}}{5}. \]</div>
+        <div id="ejemplo-gauss-seidel" class="ejemplo-generado"></div>
+      </section>
+
+      <section id="comparacion" class="seccion">
+        <p class="antetitulo">Sección D</p>
+        <h2>Comparación de los métodos</h2>
+
+        <div class="tabla-desplazable">
+          <table class="tabla-teoria">
+            <thead><tr><th scope="col">Criterio</th><th scope="col">Jacobi</th><th scope="col">Gauss-Seidel</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Actualización de variables</th><td>Simultánea, al final de cada iteración</td><td>Inmediata, una variable tras otra</td></tr>
+              <tr><th scope="row">Valores que utiliza</th><td>Solo los de la iteración anterior</td><td>Los actualizados para \(j&lt;i\) y los anteriores para \(j&gt;i\)</td></tr>
+              <tr><th scope="row">Cantidad de iteraciones</th><td>Generalmente mayor</td><td>Generalmente menor, aunque hay excepciones</td></tr>
+              <tr><th scope="row">Velocidad de convergencia</th><td>Determinada por \(\rho(T_J)\)</td><td>Determinada por \(\rho(T_G)\). En matrices tridiagonales con diagonal no nula, \(\rho(T_G)=\rho(T_J)^2\)</td></tr>
+              <tr><th scope="row">Memoria</th><td>Dos vectores</td><td>Un vector</td></tr>
+              <tr><th scope="row">Paralelización</th><td>Directa</td><td>Limitada</td></tr>
+              <tr><th scope="row">Orden de las ecuaciones</th><td>Afecta solo a qué coeficiente queda en la diagonal</td><td>También cambia cuáles valores nuevos se aprovechan</td></tr>
+              <tr><th scope="row">Limitaciones</th><td>Puede ser lento y diverge en casos donde Gauss-Seidel converge</td><td>Puede divergir en casos donde Jacobi converge</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Recorrido de cada método en el plano</h3>
+        <figure class="figura-recorrido">
+          <div id="trayectoria-comparacion" class="trayectoria"></div>
+          <figcaption>Recorrido real de ambos métodos en 2x + y = 5, x + 3y = 6, desde (0, 0). Cada ecuación es una recta y la solución es su intersección.</figcaption>
+        </figure>
+
+        <h3>Resultados reales en los sistemas de ejemplo</h3>
+        <p>Esta tabla se calcula al abrir la página, con tolerancia \(10^{-6}\), error absoluto en norma infinito, un máximo de 1000 iteraciones y \(\mathbf{x}^{(0)}=\mathbf{0}\). Los resultados muestran que ningún método es mejor en todos los casos.</p>
+        <div class="tabla-desplazable">
+          <table class="tabla-teoria tabla-numerica">
+            <thead>
+              <tr><th scope="col">Sistema</th><th scope="col">\(\rho(T_J)\)</th><th scope="col">Jacobi</th><th scope="col">\(\rho(T_G)\)</th><th scope="col">Gauss-Seidel</th><th scope="col"><span class="solo-lector">Acción</span></th></tr>
+            </thead>
+            <tbody id="comparacion-ejemplos"></tbody>
+          </table>
+        </div>
+
+        <h3>Qué significa alcanzar la tolerancia</h3>
+        <p>El criterio de parada mide cuánto cambió la aproximación entre dos iteraciones, no la distancia a la solución. Si \(\|T\| &lt; 1\), ambas cantidades se relacionan así:</p>
+        <div class="formula">\[ \left\|\mathbf{x}-\mathbf{x}^{(k)}\right\| \le \frac{\|T\|}{1-\|T\|}\,\left\|\mathbf{x}^{(k)}-\mathbf{x}^{(k-1)}\right\|. \]</div>
+        <p>Cuando \(\|T\|\) está cerca de 1, el factor es grande: un cambio muy pequeño entre iteraciones puede convivir con un error real mucho mayor. El ejemplo «Convergencia muy lenta» de la calculadora lo muestra con números.</p>
+      </section>
+
+      <footer class="pie">
+        <p>Los cálculos se ejecutan en JavaScript dentro de tu navegador. <a href="pruebas/pruebas.html">Ver las pruebas de los algoritmos</a>.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/nucleo/espacio-nombres.js"></script>
+  <script src="js/matematicas/algebra-lineal.js"></script>
+  <script src="js/matematicas/despeje.js"></script>
+  <script src="js/matematicas/jacobi.js"></script>
+  <script src="js/matematicas/gauss-seidel.js"></script>
+  <script src="js/matematicas/motor-iterativo.js"></script>
+  <script src="js/matematicas/valores-propios.js"></script>
+  <script src="js/matematicas/reordenamiento-filas.js"></script>
+  <script src="js/matematicas/analisis-convergencia.js"></script>
+  <script src="js/validacion/conversion-numerica.js"></script>
+  <script src="js/validacion/validador-sistema.js"></script>
+  <script src="js/validacion/interprete-ecuaciones.js"></script>
+  <script src="js/datos/sistemas-ejemplo.js"></script>
+  <script src="js/interfaz/utilidades-dom.js"></script>
+  <script src="js/interfaz/formato.js"></script>
+  <script src="js/graficos/grafico-lineas.js"></script>
+  <script src="js/graficos/grafico-trayectoria.js"></script>
+  <script src="js/graficos/graficos-resultados.js"></script>
+  <script src="js/interfaz/formulario-sistema.js"></script>
+  <script src="js/interfaz/desglose-iteracion.js"></script>
+  <script src="js/interfaz/informe-resultado.js"></script>
+  <script src="js/interfaz/panel-analisis.js"></script>
+  <script src="js/interfaz/tabla-iteraciones.js"></script>
+  <script src="js/interfaz/explorador-pasos.js"></script>
+  <script src="js/interfaz/ejemplos-teoria.js"></script>
+  <script src="js/interfaz/navegacion.js"></script>
+  <script src="js/aplicacion.js"></script>
+</body>
+</html>
